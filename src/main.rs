@@ -1,5 +1,8 @@
 use std::env;
 
+use anyhow::bail;
+use mmf_parser::MmfParseResult;
+
 fn get_file_as_byte_vec(filename: String) -> Vec<u8> {
     match std::fs::read(filename) {
         Ok(bytes) => {
@@ -39,6 +42,11 @@ fn print_mmf_info(mmf_info:&mmf_parser::MmfFileInfo, show_track_info:bool) {
     }
 }
 
+fn print_help() {
+    println!("TODO: print help command message");
+}
+
+
 fn main() -> anyhow::Result<()> {
     pretty_env_logger::init();
 
@@ -50,7 +58,12 @@ fn main() -> anyhow::Result<()> {
             print_mmf_info(&result, false);
         }
         Err(e) => {
-            
+            if e == MmfParseResult::NotFoundSmafHeader {
+                bail!("Not found SMAF File Header")
+            }
+            else {
+                bail!("Unknown error")
+            }
         }
     }
 
