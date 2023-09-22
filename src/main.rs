@@ -14,7 +14,7 @@ fn get_file_as_byte_vec(filename: String) -> Vec<u8> {
     }
 }
 
-fn print_help(mmf_info:&mmf_parser::MmfFileInfo, show_track_info:bool) {
+fn print_mmf_info(mmf_info:&mmf_parser::MmfFileInfo, show_track_info:bool) {
     println!("Title : {}", mmf_info.opda_block.song_title);
     println!("Author : {}", mmf_info.opda_block.author);
     println!("Copyright : {}", mmf_info.opda_block.copyright);
@@ -47,7 +47,7 @@ fn main() -> anyhow::Result<()> {
     let mmf_file_info = mmf_parser::parse(get_file_as_byte_vec(path));
     match mmf_file_info {
         Ok(result) => {
-            print_help(&result, false);
+            print_mmf_info(&result, false);
         }
         Err(e) => {
             
