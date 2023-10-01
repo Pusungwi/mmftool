@@ -51,11 +51,24 @@ fn main() -> anyhow::Result<()> {
     pretty_env_logger::init();
 
     println!("mmftool v{}", env!("CARGO_PKG_VERSION"));
-    let path = env::args().nth(1).ok_or_else(|| anyhow::anyhow!("No filename argument"))?;
+    if env::args().count() == 0 {
+        println!("No file argument");
+        print_help();
+        bail!("No file argument")
+    }
+
+    let path = env::args().nth(1).unwrap();
+    let order_main = env::args().nth(2);
+    
     let mmf_file_info = mmf_parser::parse(get_file_as_byte_vec(path));
     match mmf_file_info {
         Ok(result) => {
-            print_mmf_info(&result, false);
+            if order_main.is_none() {
+                print_mmf_info(&result, false);
+            }
+            else {
+                //TODO: Parsing main order and execute some functions, If not, Place some bail!
+            }
         }
         Err(e) => {
             if e == MmfParseResult::NotFoundSmafHeader {
