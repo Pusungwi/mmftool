@@ -43,7 +43,8 @@ fn print_mmf_info(mmf_info:&mmf_parser::MmfFileInfo, show_track_info:bool) {
 }
 
 fn print_help() {
-    println!("TODO: print help command message");
+    println!("--export-midi : export midi track to mid files (TODO)");
+    println!("--export-wave : export wave track to wav files (TODO)");
 }
 
 
@@ -51,23 +52,37 @@ fn main() -> anyhow::Result<()> {
     pretty_env_logger::init();
 
     println!("mmftool v{}", env!("CARGO_PKG_VERSION"));
-    if env::args().count() == 0 {
-        println!("No file argument");
-        print_help();
-        bail!("No file argument")
+
+    if env::args().count() == 0 || env::args().nth(1).is_none() {
+        bail!("No file argument. Please insert mmf file path.")
     }
 
-    let path = env::args().nth(1).unwrap();
-    let order_main = env::args().nth(2);
+    let arg_file_path = env::args().nth(1).unwrap();
+    let file_path = std::path::PathBuf::from(&arg_file_path);
+    if !file_path.exists() {
+        bail!("File does not exist");
+    }
+    let arg_order_main = env::args().nth(2);
     
-    let mmf_file_info = mmf_parser::parse(get_file_as_byte_vec(path));
+    let mmf_file_info = mmf_parser::parse(get_file_as_byte_vec(arg_file_path));
     match mmf_file_info {
         Ok(result) => {
-            if order_main.is_none() {
+            if arg_order_main.is_none() {
                 print_mmf_info(&result, false);
             }
             else {
                 //TODO: Parsing main order and execute some functions, If not, Place some bail!
+                if let Some(order) = arg_order_main {
+                    if order == "--export-midi" {
+                        bail!("TODO Command")
+                    }
+                    else if order == "--help" {
+                        print_help();
+                    }
+                    else {
+                        bail!("Unknown argument")
+                    }
+                }
             }
         }
         Err(e) => {
