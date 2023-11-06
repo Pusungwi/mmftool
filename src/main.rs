@@ -1,6 +1,6 @@
 use std::env;
 
-use anyhow::bail;
+use anyhow::{anyhow, bail};
 use mmf_parser::MmfParseResult;
 
 fn get_file_as_byte_vec(filename: String) -> Vec<u8> {
@@ -14,6 +14,16 @@ fn get_file_as_byte_vec(filename: String) -> Vec<u8> {
             }
             panic!("{}", e);
         }
+    }
+}
+
+fn convert_smaf_to_midi(midi_block:&mmf_parser::TrackBlock) -> anyhow::Result<Vec<u8>> {
+    if midi_block.data.is_empty() {
+        Err(anyhow!("data block is zero"))
+    }
+    else {
+        let mut result:Vec<u8> = Vec::new();
+        Ok(result)
     }
 }
 
@@ -73,8 +83,15 @@ fn main() -> anyhow::Result<()> {
             else {
                 //TODO: Parsing main order and execute some functions, If not, Place some bail!
                 if let Some(order) = arg_order_main {
-                    if order == "--export-midi" || order == "--export-wave"  {
-                        bail!("TODO Command")
+                    if order == "--export-midi"  {
+                        if result.midi_blocks.is_empty() {
+                            bail!("Not found midi data block.")
+                        }
+                    }
+                    else if order == "--export-wave" {
+                        if result.wave_blocks.is_empty() {
+                            bail!("Not found wave data block.")
+                        }
                     }
                     else if order == "--help" {
                         print_help();
