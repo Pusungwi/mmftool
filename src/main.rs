@@ -54,7 +54,7 @@ fn main() -> anyhow::Result<()> {
     println!("mmftool v{}", env!("CARGO_PKG_VERSION"));
 
     if env::args().count() == 0 || env::args().nth(1).is_none() {
-        bail!("No file argument. Please insert mmf file path.")
+        bail!("No file argument. Please insert mmf file path first.")
     }
 
     let arg_file_path = env::args().nth(1).unwrap();
@@ -73,7 +73,7 @@ fn main() -> anyhow::Result<()> {
             else {
                 //TODO: Parsing main order and execute some functions, If not, Place some bail!
                 if let Some(order) = arg_order_main {
-                    if order == "--export-midi" {
+                    if order == "--export-midi" || order == "--export-wave"  {
                         bail!("TODO Command")
                     }
                     else if order == "--help" {
