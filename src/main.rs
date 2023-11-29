@@ -2,6 +2,7 @@ use std::env;
 
 use anyhow::{anyhow, bail};
 use mmf_parser::MmfParseResult;
+use byteorder::{BigEndian, WriteBytesExt};
 
 fn get_file_as_byte_vec(filename: String) -> Vec<u8> {
     match std::fs::read(filename) {
@@ -22,7 +23,12 @@ fn convert_smaf_to_midi(midi_block:&mmf_parser::TrackBlock) -> anyhow::Result<Ve
         Err(anyhow!("data block is zero"))
     }
     else {
-        let mut result:Vec<u8> = Vec::new();
+        let mut result: Vec<u8> = vec![];
+        //MIDI Track Header
+        result.write_u8(b'M').unwrap();
+        result.write_u8(0x4d).unwrap();
+        result.write_u8(77).unwrap();
+        result.write_u8(77).unwrap();
         Ok(result)
     }
 }
