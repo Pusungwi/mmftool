@@ -33,6 +33,17 @@ fn convert_smaf_to_midi(midi_block:&mmf_parser::TrackBlock) -> anyhow::Result<Ve
     }
 }
 
+fn convert_smaf_to_wave(wave_block:&mmf_parser::TrackBlock) -> anyhow::Result<Vec<u8>> {
+    if wave_block.data.is_empty() {
+        Err(anyhow!("data block is zero"))
+    }
+    else {
+        let mut result: Vec<u8> = vec![];
+        //TODO: Need converted pcm wave block
+        Ok(result)
+    }
+}
+
 fn print_mmf_info(mmf_info:&mmf_parser::MmfFileInfo, show_track_info:bool) {
     println!("Title : {}", mmf_info.opda_block.song_title);
     println!("Author : {}", mmf_info.opda_block.author);
@@ -86,25 +97,46 @@ fn main() -> anyhow::Result<()> {
             if arg_order_main.is_none() {
                 print_mmf_info(&result, false);
             }
-            else {
-                //TODO: Parsing main order and execute some functions, If not, Place some bail!
-                if let Some(order) = arg_order_main {
-                    if order == "--export-midi"  {
-                        if result.midi_blocks.is_empty() {
-                            bail!("Not found midi data block.")
+            else if let Some(order) = arg_order_main {
+                if order == "--export-midi"  {
+                    let mut found_midi_block = false;
+                    for midi_block in &result.midi_blocks {
+                        let midi_file = convert_smaf_to_midi(midi_block);
+                        match midi_file {
+                            Ok(midi_result) => {
+                                found_midi_block = true;
+                            }
+                            Err(e) => {
+                                //TODO: bail out
+                            }
                         }
                     }
-                    else if order == "--export-wave" {
-                        if result.wave_blocks.is_empty() {
-                            bail!("Not found wave data block.")
+                    if !found_midi_block {
+                        bail!("Not found midi data block.")
+                    }
+                }
+                else if order == "--export-wave" {
+                    let mut found_wave_block = false;
+                    for wave_block in &result.wave_blocks {
+                        let wave_file = convert_smaf_to_wave(wave_block);
+                        match wave_file {
+                            Ok(wave_result) => {
+                                found_wave_block = true;
+                            }
+                            Err(e) => {
+                                //TODO: bail out
+                            }
                         }
                     }
-                    else if order == "--help" {
-                        print_help();
+                    if !found_wave_block {
+                        bail!("Not found wave data block.")
                     }
-                    else {
-                        bail!("Unknown argument")
-                    }
+                }
+                else if order == "--help" {
+                    print_help();
+                }
+                else {
+                    bail!("Unknown argument")
                 }
             }
         }
